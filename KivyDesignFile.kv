@@ -1,0 +1,579 @@
+ # -*- coding: utf-8 -*-   
+ 
+##version of english and control
+##School of Automative Studies Chongqing University
+##Design File for Remote Monitoring System on Fuel Cell
+##Name: Wen Zejun
+##Dated: 2017.3.19
+    
+#: import FadeTransition kivy.uix.screenmanager.FadeTransition
+#: import MeshLinePlot kivy.garden.graph.MeshLinePlot
+#: set default_font_size "30sp"
+#: set default_font_size_small "25sp"
+
+ScreenManager:
+    id: screen_manager
+	transition: FadeTransition()
+    LoginScreen:
+        id: login_screen
+        name: 'LoginScreen'
+        manager: screen_manager
+    IndexScreen:
+		id: index_screen
+        name: 'IndexScreen'
+        manager: screen_manager
+	RealTimeMeasurement:
+		id: realtimemeasurement_screen
+		name: 'RealTimeMeasurement'
+		manager: screen_manager
+	OfflineMonitoring:
+		id: offlinemonitoring_screen
+		name: 'OfflineMonitoring'
+		manager: screen_manager
+	RemoteControl:
+		id: remotecontrol
+		name: 'RemoteControl'
+		manager: screen_manager
+
+		
+
+
+<LoginScreen>:
+	canvas.before:
+		Color:
+			rgba: 1, 1, 1, 1
+            #rgba:231,179,37,1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'center'
+	BoxLayout:
+		orientation: 'vertical'
+		Label: 
+			text_size: self.size
+			halign: 'center'
+			valign: 'middle'
+			text: "Welcome to Fuel Cell Monitoring Application!"
+			size_hint: 1, 0.3
+            #makeup:True
+            #background_color:255,128,0,1
+			#color: 0,0,0,1
+            color:0,0,255,1
+		Image:
+			source: 'Logo_App_v3.png'
+			pos_hint: {'center_x':.5, 'center_y': .5}
+			allow_stretch: True
+		BoxLayout:
+			orientation: 'vertical'
+			size_hint: .8, .5
+			spacing: 10
+			pos_hint: {'center_x':.5, 'center_y': .5}
+			
+            AnchorLayout:
+                anchor_x: 'left'
+                size_hint_x: 1
+                TextInput:
+                    id: username
+                    multiline: False
+                    font_size: default_font_size
+                    hint_text: " Username"
+                    height: self.minimum_height
+                    size_hint_y: None
+            
+            AnchorLayout:
+                anchor_x: 'left'
+                size_hint_x: 1
+                TextInput:
+                    id: password
+                    multiline: False
+                    password:True
+                    font_size: default_font_size
+                    hint_text: " Password"
+                    height: self.minimum_height
+                    size_hint_y: None   
+		Label:
+			id: displaytext
+			text_size: self.size
+			halign: 'center'
+			valign: 'middle'
+			text: " "
+			color: 0,0,0,1
+			size_hint: 1, 0.2
+			font_size: "15sp"
+		Button:
+			on_press: displaytext.text="Logging in ..."
+			on_release: root.new_login_try(username,password, displaytext)
+			text: "Login"
+			font_size: default_font_size
+			size_hint: 1, .3
+            background_color:0,1,255,0.8
+
+        BoxLayout:
+			Label:
+				text: "Student:Wen Zejun"
+				color: 0,0,0,1
+				font_size: 20
+                
+                
+            Label:
+				text: "Supervisor:Zhang Caizhi"
+                color: 0,0,0,1
+				font_size: 20
+                
+
+
+<IndexScreen>:
+	canvas:
+		Color:
+			#rgba: 0.5, 0.2, 0.3, 0.7    ## Red, Green, Blue, Alpha (all from 0-1 only)
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+		Color:
+			rgba: 1,0,0,0.8
+	GridLayout:
+		cols: 1
+		BoxLayout:
+			Image:
+				source: 'Logo_App_v3.png'
+				pos_hint: {'center_x':.5, 'center_y': 0.4}
+				allow_stretch: True
+				id: indexlogo
+		Label:
+			id: warningbox
+			text: "Click an item to continue"
+			size_hint_y: 0.5
+			font_size: "15sp"
+			#color: 0,0,0,1
+            color:0,0,255,1
+		GridLayout:
+			cols: 2
+			size_hint: 1, 0.5
+			AnchorLayout:
+				Label:
+					text: "Raspberry Pi Status: "
+					bold: True
+					color: 0,0,0,1
+			Label:
+				id: statusid
+				text: "ON"
+				bold: True
+				color: 0,0,0,0.7
+		Button:
+			id: realtimemeasurement
+			text: "Real Time Measurement"
+			font_size: default_font_size
+			on_release: root.manager.current = "RealTimeMeasurement"
+            background_color:0,1,255,0.8
+		Button:
+			id: offlinemonitoring
+			text: "Offline Monitoring"
+			font_size: default_font_size
+			on_release: root.manager.current = "OfflineMonitoring"
+		Button:
+			id: remotecontrol
+			text: "Remote Control"
+			text_size: self.size
+			halign: 'center'
+			valign: 'middle'
+			font_size: default_font_size
+			on_release: root.manager.current = "RemoteControl"
+            background_color:0,1,255,0.8
+		
+		Button:
+			id: signout
+			on_press: warningbox.text="Logging out ..."
+			on_release: warningbox.text="Click on an item to continue"
+			on_release: root.signout()
+			text: "Sign Out"
+			font_size: default_font_size
+			
+<RealTimeMeasurement>:
+	DropDown:
+		id: dropdown
+		on_select: dropdown_paramselect.text = 'Selected parameter: {}'.format(args[1])
+
+		Button:
+			text: 'Voltage'
+			size_hint_y: None
+			on_release: dropdown.select('Voltage')
+
+		Button:
+			text: 'Current'
+			size_hint_y: None
+			on_release: dropdown.select('Current')
+
+		Button:
+			text: 'Temperature'
+			size_hint_y: None
+			on_release: dropdown.select('Temperature')
+
+	BoxLayout:
+		canvas:
+            Color:
+                rgb: 0, 0, 0
+            Rectangle:
+                size: self.size
+		orientation: "vertical"
+		BoxLayout:
+			size_hint: [1, .15]
+			orientation: "vertical"
+			Label:
+				size_hint: [1, .5]
+				text_size: self.size
+				halign: 'center'
+				valign: 'middle'
+				text: 'Welcome to the RealTime Monitoring of Fuel Cell!'
+				bold: True
+                color:0,0,255,1
+			Button:
+				size_hint: [1, .5]
+				id: dropdown_paramselect
+				text: 'Press here to select the parameters'
+				size_hint_y: 0.9
+				on_release: dropdown.open(self)
+		BoxLayout:
+			size_hint: [1, 0.05] #[1, .6] #[1, .05]
+			orientation: "vertical"
+			Label:
+				id: displaytext
+				text_size: self.size
+				halign: 'center'
+				valign: 'middle'
+				text: " "
+				color: 1,1,1,1
+				size_hint: 1, 0.2
+				font_size: "15sp"
+		BoxLayout:
+			size_hint: [1, .6] #[1, .05] #[1, .6]
+			Graph:
+				id: graph1
+				xlabel:'Time (min)'
+				ylabel:'Graph 1'
+				x_ticks_minor:1
+				x_ticks_major:5
+				y_ticks_minor:1
+				y_ticks_major:1
+				y_grid_label:True
+				x_grid_label:True
+				padding:5
+				x_grid:True
+				y_grid:True
+				xmin:0
+				xmax:100
+				ymin:-1
+				ymax:1
+				draw_border: True
+		BoxLayout:
+			size_hint: [1, .1]
+			orientation: "horizontal"
+			Button:
+				text: "Prev Value"
+				bold: True
+				size_hint: [0.5,1]
+				on_press: root.Display_value(-1, xlabel_disp, ylabel_disp, displaytext)
+			BoxLayout:
+				size_hint: [1, 1]
+				orientation: "horizontal"
+				BoxLayout:
+					size_hint: [1, 1]
+					orientation: "vertical"
+					Label:
+						text: '{}:'.format(graph1.ylabel)
+						bold: True
+					Label:
+						text: '{}:'.format('Time (h:m:s)')
+						bold: True
+				BoxLayout:
+					size_hint: [1, 1]
+					orientation: "vertical"
+					Label:
+					    id: ylabel_disp
+						text: 'None'
+						bold: True
+					Label:
+					    id: xlabel_disp
+						text: 'None'
+						bold: True
+			Button:
+				text: "Next Value"
+				bold: True
+				size_hint: [0.5,1]
+				on_press: root.Display_value(1, xlabel_disp, ylabel_disp, displaytext)
+		BoxLayout:
+			size_hint: [1, .1]
+			orientation: "horizontal"
+			Button:
+				text: "Stop Monitoring"
+				bold: False
+				on_press: root.stop()
+                background_color:255,0,0,1
+			Button:
+				id: back_realtimemeasurement
+				on_press: root.setdefault(ylabel_disp, xlabel_disp, dropdown_paramselect)
+				on_release: root.manager.current = "IndexScreen"
+				text: "IndexPage"
+			Button:
+				text: "Start Monitoring"
+				bold: False
+				on_press: root.start(displaytext, graph1, dropdown_paramselect, xlabel_disp, ylabel_disp)
+                background_color:0,255,0,1
+			
+
+		
+
+<OfflineMonitoring>:
+	DropDown:
+		id: dropdown
+		on_select: dropdown_paramselect2.text = 'Selected parameter: {}'.format(args[1])
+
+		Button:
+			text: 'Voltage'
+			size_hint_y: None
+			on_release: dropdown.select('Voltage')
+
+		Button:
+			text: 'Current'
+			size_hint_y: None
+			on_release: dropdown.select('Current')
+
+		Button:
+			text: 'Temperature'
+			size_hint_y: None
+			on_release: dropdown.select('Temperature')
+
+	BoxLayout:
+	    canvas:
+            Color:
+                rgb: 0, 0, 0
+            Rectangle:
+                size: self.size
+		orientation: "vertical"
+		BoxLayout:
+			size_hint: [1, .15]
+			orientation: "vertical"
+			Label:
+				text_size: self.size
+				halign: 'center'
+				valign: 'middle'
+				text: 'Welcome to the Offline Monitoring of Fuel Cell!'
+				bold: True
+                color:0,0,255,1
+			BoxLayout:
+				orientation: "horizontal"			
+				TextInput:
+					id: graph2_year
+					multiline: False
+					hint_text: " Year eg: 2017"
+				TextInput:
+					id: graph2_month
+					multiline: False
+					hint_text: " Month eg: 02"
+				TextInput:
+					id: graph2_day
+					multiline: False
+					hint_text: " Day eg: 22"
+			Button:
+				size_hint: [1, .1]
+				id: dropdown_paramselect2
+				text: 'Press here to select the parameters'
+				size_hint_y: 0.8
+				on_release: dropdown.open(self)
+
+
+		BoxLayout:
+			size_hint: [1, 0.05]
+			orientation: "vertical"
+			Label:
+				id: displaytext
+				text_size: self.size
+				halign: 'center'
+				valign: 'middle'
+				text: ""
+				color: 1,1,1,1
+				size_hint: 1, 0.2
+				font_size: "15sp"
+		BoxLayout:
+			size_hint: [1, .7]
+			Graph:
+				id: graph2
+				xlabel:'Time (min)'
+				ylabel:'Graph 1'
+				x_ticks_minor:10
+				x_ticks_major: 240
+				y_ticks_minor:1
+				y_ticks_major:1
+				y_grid_label:True
+				x_grid_label:True
+				padding:5
+				x_grid:True
+				y_grid:True
+				xmin:0
+				xmax:100
+				ymin:-1
+				ymax:1
+				draw_border: True
+		BoxLayout:
+			size_hint: [1, .1]
+			orientation: "horizontal"
+			Button:
+				text: "Prev Value"
+				bold: True
+				size_hint: [0.5,1]
+				on_press: root.Display_value(-1, graph2, xlabel_disp2, ylabel_disp2, displaytext)
+			BoxLayout:
+				size_hint: [1, 1]
+				orientation: "horizontal"
+				BoxLayout:
+					size_hint: [1, 1]
+					orientation: "vertical"
+					Label:
+						text: '{}:'.format(graph2.ylabel)
+						bold: True
+					Label:
+						text: '{}:'.format('Time (h:m:s)')
+						bold: True
+				BoxLayout:
+					size_hint: [1, 1]
+					orientation: "vertical"
+					Label:
+					    id: ylabel_disp2
+						text: 'None'
+						bold: True
+					Label:
+					    id: xlabel_disp2
+						text: 'None'
+						bold: True
+			Button:
+				text: "Next Value"
+				bold: True
+				size_hint: [0.5,1]
+				on_press: root.Display_value(1, graph2, xlabel_disp2, ylabel_disp2, displaytext)
+		BoxLayout:
+			size_hint: [1, .1]
+			orientation: "horizontal"
+			Button:
+				id: back_offlinemonitoring
+				on_press: root.setdefault(ylabel_disp2, xlabel_disp2, dropdown_paramselect2, displaytext)
+				on_release: root.manager.current = "IndexScreen"
+				text: "Back to IndexPage"
+			Button:
+				text: "Acquire Data"
+				bold: False
+				on_press: root.start(displaytext, graph2, graph2_year, graph2_month, graph2_day, dropdown_paramselect2, xlabel_disp2, ylabel_disp2)
+                background_color:0,255,0,1
+			
+			
+<RemoteControl>:
+    canvas.before:
+		Color:
+			rgba: 1, 1, 1, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+    AnchorLayout:
+		anchor_x: 'center'
+		anchor_y: 'center'
+
+	BoxLayout:
+		orientation: "vertical"
+		BoxLayout:
+			size_hint: [1, .1]
+			orientation: "vertical"
+			Label:
+				text_size: self.size
+				halign: 'center'
+				valign: 'middle'
+				text: 'Welcome to the Remote Control of Fuel Cell!'
+                #color:0,0,0,1
+                color:0,0,255,1
+				#bold: True
+				
+        BoxLayout:
+            size_hint:[1,0.1]
+            Image:
+                source: 'solenoid.jpg'
+                #pos_hint: {'center_x':0.1, 'center_y': 0.1}
+                allow_stretch: True
+            Image:
+                source: 'led.jpg'
+                #pos_hint: {'center_x':0.1, 'center_y': 0.1}
+                allow_stretch: True
+            Image:
+                source: 'relay.jpg'
+                #pos_hint: {'center_x':0.1, 'center_y': 0.1}
+                allow_stretch: True
+
+        BoxLayout:	
+			size_hint: [1, .1]
+			orientation: "vertical"		
+			Label:
+				id: bt_disp
+				text_size: self.size
+				halign: 'center'
+				valign: 'middle'
+				text: "Please select the solenoid valve status."
+				color: 0,0,0,1
+				size_hint: 1, 0.1
+				font_size: "15sp"
+		
+		BoxLayout:	
+			size_hint: [1, .1]
+			orientation: "horizontal"	
+			Button:
+				id: bt_send1
+				on_press: root.btsend(bt_disp, status) 
+				#on_release: root.btsend("Engine", bt_send1, bt_disp) # (bt_message, button_state_down_up_Trigger)
+				text: "Start"
+                font_size:"30sp"
+                background_color:0,255,0,1
+				
+			Button:
+				id: bt_send2
+				on_press: root.btsend2(bt_disp, status) #
+				text: "Stop"
+                font_size:"30sp"
+                background_color:255,0,0,1
+                #color:1,0,0,0.5
+							
+		BoxLayout:
+			size_hint: [0.8, 0.1]
+			orientation: "horizontal"
+            color:0.5,0.5,0.5,0.5
+            BoxLayout:
+                size_hint: [0.5,.1]
+			BoxLayout:
+				#size_hint: [1, 0.1]
+				Label:
+					text: 'Status:'
+                    font_size:"35sp"
+                    color:0,0,0,1
+                    halign:'center'
+                    valign:'middle'
+					bold: True
+
+			BoxLayout:
+				#size_hint: [1, 0.1]
+				Label:
+					id: status
+					text: 'None'
+                    font_size:"35sp"
+                    color:0,0,0,1
+                    halign:'center'
+                    valign:'middle'
+					bold: True			
+		
+		BoxLayout:
+			size_hint: [1, .1]
+			orientation: "horizontal"
+			Button:
+				id: back_localmonitoring
+				on_release: root.manager.current = "IndexScreen"
+				text: "Back to IndexPage"
+				font_size: "25sp"
+			
+
+
